@@ -58,7 +58,7 @@ class Appointment(models.Model):
     created_at = models.DateTimeField(verbose_name="Дата создания", auto_now_add=True)
     status = models.CharField(choices=Status.choices, default=Status.AWAITS)
     started_at = models.DateTimeField(verbose_name="Начало приема")
-    ended_at = models.DateTimeField(verbose_name="Конец приема")
+    ended_at = models.DateTimeField(null=True, blank=True, verbose_name="Конец приема")
 
     class Meta:
         indexes = [models.Index(fields=["doctor", "created_at", "status"])]

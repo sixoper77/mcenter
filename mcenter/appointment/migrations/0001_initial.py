@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('physical_address', models.CharField(blank=True, max_length=255)),
             ],
             options={
-                'indexes': [models.Index(fields=['name'], name='main_clinic_name_4ae83f_idx')],
+                'indexes': [models.Index(fields=['name'], name='appointment_clinic_name_4ae83f_idx')],
             },
         ),
         migrations.CreateModel(
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('specialization', models.CharField(blank=True, max_length=255)),
-                ('clinic', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.clinic')),
+                ('clinic', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='appointment.clinic')),
                 ('doctor', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
@@ -44,17 +44,17 @@ class Migration(migrations.Migration):
                 ('started_at', models.DateTimeField(blank=True, null=True)),
                 ('ended_at', models.DateTimeField(blank=True, null=True)),
                 ('patient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='patient_appointments', to=settings.AUTH_USER_MODEL, verbose_name='Пациент')),
-                ('clinic', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='clinic_appointments', to='main.clinic', verbose_name='Клиника')),
-                ('doctor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='appointments', to='main.doctor', verbose_name='Доктор')),
+                ('clinic', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='clinic_appointments', to='appointment.clinic', verbose_name='Клиника')),
+                ('doctor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='appointments', to='appointment.doctor', verbose_name='Доктор')),
             ],
         ),
         migrations.AddIndex(
             model_name='doctor',
-            index=models.Index(fields=['clinic', 'specialization'], name='main_doctor_clinic__cb3c90_idx'),
+            index=models.Index(fields=['clinic', 'specialization'], name='appointment_doctor_clinic__cb3c90_idx'),
         ),
         migrations.AddIndex(
             model_name='appointment',
-            index=models.Index(fields=['doctor', 'created_at', 'status'], name='main_appoin_doctor__83f254_idx'),
+            index=models.Index(fields=['doctor', 'created_at', 'status'], name='appointment_appoin_doctor__83f254_idx'),
         ),
         migrations.AddConstraint(
             model_name='appointment',
