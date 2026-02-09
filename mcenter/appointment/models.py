@@ -18,7 +18,11 @@ class Clinic(models.Model):
 
 
 class Doctor(models.Model):
-    doctor = models.OneToOneField(User, on_delete=models.CASCADE)
+    doctor = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile",
+    )
     specialization = models.CharField(max_length=255, null=False, blank=True)
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
 
