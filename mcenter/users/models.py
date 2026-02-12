@@ -8,7 +8,7 @@ class Users(AbstractUser):
         PATIENT = "patient", "Пользователь"
 
     email = models.EmailField(unique=True)
-    username = models.CharField(unique=True, max_length=255)
+    username = models.CharField(unique=True, max_length=150)
     surname = models.CharField(max_length=255, null=False, blank=True)
     image = models.ImageField(upload_to="users_images", blank=True)
     role = models.CharField(
@@ -18,7 +18,4 @@ class Users(AbstractUser):
         verbose_name="Роль",
     )
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(name="unique_username", fields=["username"])
-        ]
+    USERNAME_FIELD = "email"
