@@ -1,8 +1,6 @@
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import F, Q
-
-User = get_user_model()
+from django.conf import settings
 
 
 class Clinic(models.Model):
@@ -19,7 +17,7 @@ class Clinic(models.Model):
 
 class Doctor(models.Model):
     doctor = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="profile",
     )
@@ -36,10 +34,10 @@ class Doctor(models.Model):
 class Appointment(models.Model):
     class Status(models.TextChoices):
         CONFIRMED = "confirmed", "Подтверджена"
-        PAID = "paid", " Оплачен"
-        STARTED = "started", " Начата"
-        AWAITS = "awaiting", "ожидается"
-        COMPLETED = "completed", "завершена"
+        PAID = "paid", "Оплачен"
+        STARTED = "started", "Начата"
+        AWAITS = "awaiting", "Ожидается"
+        COMPLETED = "completed", "Завершена"
 
     doctor = models.ForeignKey(
         Doctor,
@@ -48,7 +46,7 @@ class Appointment(models.Model):
         verbose_name="Доктор",
     )
     patient = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name="Пациент",
         related_name="patient_appointments",
