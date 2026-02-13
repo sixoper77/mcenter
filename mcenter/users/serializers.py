@@ -1,7 +1,6 @@
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework.validators import UniqueValidator
 
 from .models import Users
 
@@ -27,10 +26,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserRegistrationsSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, validators=[validate_password])
-    password_confirmed = serializers.CharField(write_only=True)
-    username = serializers.CharField()
-    email = serializers.EmailField()
+    password = serializers.CharField(
+        write_only=True, required=True, validators=[validate_password]
+    )
+    password_confirmed = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = Users
