@@ -16,6 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "surname",
             "image",
+            "role",
         )
 
     def get_image(self, obj):
