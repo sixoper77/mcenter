@@ -22,3 +22,4 @@ products/
 dump.py
 cars.session.sql
 users_image
+.ruff_cache/

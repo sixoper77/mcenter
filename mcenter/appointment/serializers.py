@@ -1,12 +1,11 @@
 from django.db import transaction
 from rest_framework import serializers
-from users.models import Users
-from users.serializers import UserSerializer
 
-from appointment.models import Clinic, Doctor
+from .models import Clinic, Doctor
+from users.models import User
 
 
-class ClinickSerializer(serializers.ModelSerializer):
+class ClinicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Clinic
         fields = ("name", "legal_address", "physical_address")
@@ -24,6 +23,6 @@ class DoctorSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             new_doctor = Doctor.objects.create(**validated_data)
             doctor = new_doctor.doctor
-            doctor.role = Users.RoleChoise.DOCTOR
+            doctor.role = User.RoleChoise.DOCTOR
             doctor.save()
             return new_doctor

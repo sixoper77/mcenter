@@ -1,9 +1,9 @@
-from rest_framework import generics, permissions, status, views
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.models import Users
-from users.serializers import UserRegistrationsSerializer, UserSerializer
+from .models import User
+from .serializers import UserRegistrationsSerializer, UserSerializer
 
 
 class UserRegisterAPIView(generics.CreateAPIView):
@@ -28,5 +28,5 @@ class UserRegisterAPIView(generics.CreateAPIView):
 
 class UserProfileAPIView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
-    queryset = Users.objects.all()
+    queryset = User.objects.all()
     permission_classes = [permissions.AllowAny]

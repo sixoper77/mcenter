@@ -12,6 +12,9 @@ dependencies = [
     "pillow==12.1.0",
     "pyjwt==2.11.0",
     "python-dotenv==1.2.1",
+    "ruff>=0.15.1",
     "sqlparse==0.5.5",
     "tzdata==2025.3",
 ]
+[tool.ruff.lint.isort]
+known-first-party = ["appointment", "users", "mcenter"]

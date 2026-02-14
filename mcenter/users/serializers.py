@@ -2,14 +2,14 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .models import Users
+from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
     class Meta:
-        model = Users
+        model = User
         fields = (
             "username",
             "first_name",
@@ -33,7 +33,7 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
     password_confirmed = serializers.CharField(write_only=True, required=True)
 
     class Meta:
-        model = Users
+        model = User
         fields = (
             "username",
             "first_name",
@@ -52,4 +52,4 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop("password_confirmed")
-        return Users.objects.create_user(**validated_data)
+        return User.objects.create_user(**validated_data)

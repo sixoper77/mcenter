@@ -1,6 +1,6 @@
+from django.conf import settings
 from django.db import models
 from django.db.models import F, Q
-from django.conf import settings
 
 
 class Clinic(models.Model):
@@ -22,10 +22,13 @@ class Doctor(models.Model):
         related_name="profile",
     )
     specialization = models.CharField(max_length=255, null=False, blank=True)
-    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
+    clinic = models.ManyToManyField(
+        Clinic,
+        related_name="doctors",
+    )
 
     class Meta:
-        indexes = [models.Index(fields=["clinic", "specialization"])]
+        indexes = [models.Index(fields=["doctor","specialization"])]
 
     def __str__(self):
         return f"{self.doctor.get_full_name()} {self.specialization}"
