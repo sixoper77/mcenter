@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class User(AbstractUser):
@@ -17,6 +18,7 @@ class User(AbstractUser):
         default=RoleChoices.PATIENT,
         verbose_name="Роль",
     )
+    phone = PhoneNumberField(unique=True,default='+1')
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username", "first_name", "last_name"]

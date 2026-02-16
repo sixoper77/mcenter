@@ -1,6 +1,9 @@
 from django.conf import settings
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import F, Q
+from django.db.models import Q
 
 
 class Clinic(models.Model):
@@ -28,7 +31,7 @@ class Doctor(models.Model):
     )
 
     class Meta:
-        indexes = [models.Index(fields=["doctor","specialization"])]
+        indexes = [models.Index(fields=["doctor", "specialization"])]
 
     def __str__(self):
         return f"{self.doctor.get_full_name()} {self.specialization}"
@@ -39,7 +42,7 @@ class Appointment(models.Model):
         CONFIRMED = "confirmed", "Подтверджена"
         PAID = "paid", "Оплачен"
         STARTED = "started", "Начата"
-        AWAITS = "awaiting", "Ожидается"
+        AWAITING = "awaiting", "Ожидается"
         COMPLETED = "completed", "Завершена"
 
     doctor = models.ForeignKey(
@@ -61,22 +64,48 @@ class Appointment(models.Model):
         related_name="clinic_appointments",
     )
     created_at = models.DateTimeField(verbose_name="Дата создания", auto_now_add=True)
-    status = models.CharField(choices=Status.choices, default=Status.AWAITS)
-    started_at = models.DateTimeField(verbose_name="Начало приема")
-    ended_at = models.DateTimeField(null=True, blank=True, verbose_name="Конец приема")
+    status = models.CharField(choices=Status.choices, default=Status.AWAITING)
+    timestamp = DateTimeRangeField()
 
     class Meta:
         indexes = [models.Index(fields=["doctor", "created_at", "status"])]
         constraints = [
-            models.CheckConstraint(
-                condition=Q(ended_at__gt=F("started_at")),
-                name="ended_time_gt_started_time",
+            ExclusionConstraint(
+                name="unique_timestamp_for_doctor_appointment",
+                expressions=[
+                    ("timestamp", RangeOperators.OVERLAPS),
+                    ("doctor", RangeOperators.EQUAL),
+                ],
+                condition=Q(status__in=["paid", "awaiting", "confirmed", "started"]),
             ),
-            models.UniqueConstraint(
-                name="unique_doctor_started_at_time",
-                fields=["doctor", "started_at"],
+            ExclusionConstraint(
+                name="unique_timestamp_for_patient",
+                expressions=[
+                    ("timestamp", RangeOperators.OVERLAPS),
+                    ("patient", RangeOperators.EQUAL),
+                ],
+                condition=Q(status__in=["awaiting", "started", "paid", "confirmed"]),
             ),
         ]
 
     def __str__(self):
-        return f"{self.patient} {self.doctor} {self.started_at}"
+        start_time = (
+            self.timestamp.lower.strftime("%Y-%m-%d %H:%M")
+            if self.timestamp
+            else "No time"
+        )
+        return f"{self.patient} {self.doctor} {start_time}"
+
+    def clean(self):
+        if self.doctor_id and self.patient_id:
+            if self.doctor.doctor_id == self.patient_id:
+                raise ValidationError("Доктор не может быть записан сам к себе")
+
+        if self.clinic_id and self.doctor_id:
+            if not self.doctor.clinic.filter(id=self.clinic_id).exists():
+                raise ValidationError("Доктор не работает в этой клиннике")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
