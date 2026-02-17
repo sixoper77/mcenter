@@ -8,6 +8,6 @@ class ClinicAPIView(generics.CreateAPIView):
     permission_classes = [permissions.IsAdminUser]
 
 
-class DoctorAPIView(generics.CreateAPIView):
+class DoctorRoleChangeAPIView(generics.CreateAPIView):
     serializer_class = DoctorSerializer
     permission_classes = [permissions.IsAdminUser]

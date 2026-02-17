@@ -85,13 +85,13 @@ WSGI_APPLICATION = "mcenter.wsgi.application"
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME':os.getenv('NAME_DATABASE'),
-        'USER':os.getenv('USER_DATABASE'),
-        'PASSWORD':os.getenv('PASSWORD_DATABASE'),
-        'HOST':os.getenv('HOST'),
-        'PORT':os.getenv('PORT'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("NAME_DATABASE"),
+        "USER": os.getenv("USER_DATABASE"),
+        "PASSWORD": os.getenv("PASSWORD_DATABASE"),
+        "HOST": os.getenv("HOST"),
+        "PORT": os.getenv("PORT"),
     }
 }
 
@@ -144,6 +144,13 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 AUTH_USER_MODEL = "users.User"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
