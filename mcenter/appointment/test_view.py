@@ -44,7 +44,7 @@ class TestDoctorRoleChangeAPI:
             "clinic": clinic.id,
             "specialization": "Терапевт",
         }
-        response = api_client.post("/appointment/doctor/", payload)  # Укажи свой URL
+        response = api_client.post("/appointment/doctor/", payload)
         assert response.status_code == 201
         assert Doctor.objects.filter(doctor=regular_user, clinic=clinic).exists()
         regular_user.refresh_from_db()
