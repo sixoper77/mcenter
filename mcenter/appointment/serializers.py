@@ -20,9 +20,11 @@ class DoctorSerializer(serializers.ModelSerializer):
         fields = ("doctor", "clinic", "specialization")
 
     def create(self, validated_data):
+        clinic = validated_data.pop('clinic',[])
         with transaction.atomic():
             new_doctor = Doctor.objects.create(**validated_data)
+            new_doctor.clinic.set(clinic)
             doctor = new_doctor.doctor
-            doctor.role = User.RoleChoise.DOCTOR
+            doctor.role = User.RoleChoices.DOCTOR
             doctor.save()
             return new_doctor
