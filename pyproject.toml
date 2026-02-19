@@ -7,9 +7,12 @@ requires-python = ">=3.12.5"
 dependencies = [
     "asgiref==3.11.0",
     "django==6.0.1",
+    "django-filter>=25.2",
     "django-phonenumber-field[phonenumbers]>=8.4.0",
+    "django-silk>=5.4.3",
     "djangorestframework==3.16.1",
     "djangorestframework-simplejwt==5.5.1",
+    "drf-extra-fields>=3.7.0",
     "pillow==12.1.0",
     "psycopg2>=2.9.11",
     "pyjwt==2.11.0",

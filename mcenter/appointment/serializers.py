@@ -1,8 +1,10 @@
 from django.db import transaction
+from drf_extra_fields.fields import DateTimeRangeField
 from rest_framework import serializers
 
-from .models import Clinic, Doctor
 from users.models import User
+
+from .models import Appointment, Clinic, Doctor
 
 
 class ClinicSerializer(serializers.ModelSerializer):
@@ -20,7 +22,7 @@ class DoctorSerializer(serializers.ModelSerializer):
         fields = ("doctor", "clinic", "specialization")
 
     def create(self, validated_data):
-        clinic = validated_data.pop('clinic',[])
+        clinic = validated_data.pop("clinic", [])
         with transaction.atomic():
             new_doctor = Doctor.objects.create(**validated_data)
             new_doctor.clinic.set(clinic)
@@ -28,3 +30,19 @@ class DoctorSerializer(serializers.ModelSerializer):
             doctor.role = User.RoleChoices.DOCTOR
             doctor.save()
             return new_doctor
+
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    timestamp = DateTimeRangeField()
+
+    class Meta:
+        model = Appointment
+        fields = (
+            "doctor",
+            "clinic",
+            "timestamp",
+            "status",
+        )
+
+    def create(self, validated_data):
+        return Appointment.objects.create(**validated_data)

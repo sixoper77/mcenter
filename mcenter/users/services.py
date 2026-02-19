@@ -11,7 +11,7 @@ def get_response_for_user(request, user, status,message):
             "user": UserSerializer(user, context={"request": request}).data,
             "refresh": str(refresh_token),
             "access": str(refresh_token.access_token),
-            "message": "Registration was successful",
+            "message": message,
         },
         status=status,
     )
