@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "silk",
     "phonenumber_field",
-    "django_filter",
+    "django_filters",
     "appointment",
     "users",
 ]

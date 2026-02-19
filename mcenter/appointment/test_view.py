@@ -1,8 +1,8 @@
 import pytest
-
+from datetime import timedelta
 from users.models import User
 
-from .models import Clinic, Doctor
+from .models import Clinic, Doctor,Appointment
 
 
 @pytest.mark.django_db
@@ -54,3 +54,86 @@ class TestDoctorRoleChangeAPI:
         response = api_client.post("/appointment/doctor/", payload)
 
         assert response.status_code == 403
+
+
+@pytest.mark.django_db
+class TestAppointmentAPI:
+    url = "/appointment/appointment/"
+
+    def get_data(self, response):
+        if isinstance(response.data, dict) and 'results' in response.data:
+            return response.data['results']
+        return response.data
+
+    def test_create_appointment_assigns_patient_automatically(self, api_client, regular_user, doctor, clinic):
+        api_client.force_authenticate(user=regular_user)
+        
+        payload = {
+            "doctor": doctor.id,
+            "clinic": clinic.id,
+            "timestamp": {
+                "lower": "2026-03-01 15:00:00",
+                "upper": "2026-03-01 15:30:00"
+            }
+        }
+        
+        response = api_client.post(self.url, payload, format="json")
+        
+        assert response.status_code == 201
+        assert Appointment.objects.count() == 1
+        
+        created_appointment = Appointment.objects.first()
+        assert created_appointment.patient == regular_user
+
+    def test_user_sees_only_own_appointments(self, api_client, regular_user, appointment):
+        other_user = User.objects.create_user(username="spy", password="123")
+        
+        api_client.force_authenticate(user=other_user)
+        response = api_client.get(self.url)
+        assert response.status_code == 200
+        assert len(self.get_data(response)) == 0
+
+        api_client.force_authenticate(user=regular_user)
+        response = api_client.get(self.url)
+        assert len(self.get_data(response)) == 1
+        assert self.get_data(response)[0]['id'] == appointment.id
+
+    def test_search_by_doctor_first_name(self, api_client, regular_user, appointment):
+        api_client.force_authenticate(user=regular_user)
+        
+        response = api_client.get(f"{self.url}?search=Иван")
+        assert response.status_code == 200
+        assert len(self.get_data(response)) == 1
+        
+        response = api_client.get(f"{self.url}?search=Петр")
+        assert len(self.get_data(response)) == 0
+
+    def test_filter_by_status(self, api_client, regular_user, appointment):
+        api_client.force_authenticate(user=regular_user)
+        
+        response = api_client.get(f"{self.url}?status=awaiting")
+        assert response.status_code == 200
+        assert len(self.get_data(response)) == 1
+        
+        response = api_client.get(f"{self.url}?status=paid")
+        assert len(self.get_data(response)) == 0
+        
+    def test_double_booking_prevention(self, api_client, regular_user, doctor, clinic, appointment):
+        another_user = User.objects.create_user(username="nagliy_tip", password="123")
+        api_client.force_authenticate(user=another_user)
+        
+        start_time = appointment.timestamp.lower
+        
+        payload = {
+            "doctor": doctor.id,
+            "clinic": clinic.id,
+            "timestamp": {
+                "lower": start_time.isoformat(),
+                "upper": (start_time + timedelta(minutes=15)).isoformat()
+            }
+        }
+        
+        response = api_client.post(self.url, payload, format="json")
+        
+        assert response.status_code == 400
+        assert Appointment.objects.count() == 1
