@@ -137,3 +137,79 @@ class TestAppointmentAPI:
         
         assert response.status_code == 400
         assert Appointment.objects.count() == 1
+        
+        
+    def test_queryset_patient_sees_own(self, api_client, regular_user, appointment):
+        api_client.force_authenticate(user=regular_user)
+        response = api_client.get(self.url)
+        assert response.status_code == 200
+        data = self.get_data(response)
+        assert len(data) == 1
+        assert data[0]["id"] == appointment.id
+
+    def test_queryset_doctor_sees_own(self, api_client, doctor, appointment):
+        api_client.force_authenticate(user=doctor.doctor)
+        response = api_client.get(self.url)
+        assert response.status_code == 200
+        data = self.get_data(response)
+        assert len(data) == 1
+        assert data[0]["id"] == appointment.id
+
+    def test_queryset_admin_sees_all(self, api_client, admin_user, appointment):
+        api_client.force_authenticate(user=admin_user)
+        response = api_client.get(self.url)
+        assert response.status_code == 200
+        assert len(self.get_data(response)) == 1
+
+    def test_patient_can_create_appointment(self, api_client, regular_user, doctor, clinic):
+        api_client.force_authenticate(user=regular_user)
+        payload = {
+            "doctor": doctor.id,
+            "clinic": clinic.id,
+            "timestamp": {
+                "lower": "2026-05-01T10:00:00Z",
+                "upper": "2026-05-01T10:30:00Z"
+            }
+        }
+        response = api_client.post(self.url, payload, format="json")
+        assert response.status_code == 201
+
+    def test_patient_cannot_patch_appointment(self, api_client, regular_user, appointment):
+        api_client.force_authenticate(user=regular_user)
+        response = api_client.patch(f"{self.url}{appointment.id}/", {"status": "paid"})
+        assert response.status_code == 403
+
+    def test_doctor_cannot_create_appointment(self, api_client, doctor, clinic):
+        api_client.force_authenticate(user=doctor.doctor)
+        payload = {
+            "doctor": doctor.id,
+            "clinic": clinic.id,
+            "timestamp": {
+                "lower": "2026-05-02T10:00:00Z",
+                "upper": "2026-05-02T10:30:00Z"
+            }
+        }
+        response = api_client.post(self.url, payload, format="json")
+        assert response.status_code == 403
+
+    def test_doctor_can_patch_appointment(self, api_client, doctor, appointment):
+        api_client.force_authenticate(user=doctor.doctor)
+        response = api_client.patch(f"{self.url}{appointment.id}/", {"status": "paid"})
+        assert response.status_code == 200
+
+    def test_admin_can_create_and_patch_appointment(self, api_client, admin_user, doctor, clinic, appointment):
+        api_client.force_authenticate(user=admin_user)
+        
+        payload = {
+            "doctor": doctor.id,
+            "clinic": clinic.id,
+            "timestamp": {
+                "lower": "2026-05-03T10:00:00Z",
+                "upper": "2026-05-03T10:30:00Z"
+            }
+        }
+        res_post = api_client.post(self.url, payload, format="json")
+        assert res_post.status_code == 201
+
+        res_patch = api_client.patch(f"{self.url}{appointment.id}/", {"status": "completed"})
+        assert res_patch.status_code == 200
