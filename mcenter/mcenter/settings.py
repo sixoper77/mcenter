@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "silk",
     "phonenumber_field",
     "django_filters",
+    "drf_spectacular",
     "appointment",
     "users",
 ]
@@ -123,11 +124,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'Europe/Kyiv'
+TIME_ZONE = "Europe/Kyiv"
 USE_TZ = True
 
 USE_I18N = True
-
 
 
 # Static files (CSS, JavaScript, Images)
@@ -153,6 +153,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
