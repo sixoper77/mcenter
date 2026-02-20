@@ -24,3 +24,5 @@ cars.session.sql
 users_image
 .ruff_cache/
 .pytest_cache/
+htmlcov/
+.coverage

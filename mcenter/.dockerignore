@@ -1,0 +1,12 @@
+.venv/
+.vscode/
+.ruff_cache/
+__pycache__/
+.pytest_cache/
+htmlcow/
+.venv
+.git
+__pycache__
+*.pyc
+htmlcov
+db.sqlite3
