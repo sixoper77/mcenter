@@ -25,12 +25,12 @@ class DoctorAdmin(admin.ModelAdmin):
     list_display = [
         "doctor",
         "specialization",
-        "clinic",
+        "get_clinics",
     ]
     search_fields = [
-        "doctor",
+        "doctor__username",
         "^specialization",
-        "clinic",
+        "clinic__name",
     ]
     list_filter = [
         "specialization",

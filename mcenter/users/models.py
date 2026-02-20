@@ -18,7 +18,7 @@ class User(AbstractUser):
         default=RoleChoices.PATIENT,
         verbose_name="Роль",
     )
-    phone = PhoneNumberField(unique=True,default='+1')
+    phone = PhoneNumberField(unique=True,)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username", "first_name", "last_name"]
