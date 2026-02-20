@@ -12,6 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
+            "id",
             "username",
             "first_name",
             "last_name",
@@ -36,6 +37,7 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
+            "id",
             "username",
             "first_name",
             "last_name",
@@ -59,7 +61,8 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
 
 class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField(
-        write_only=True, required=True, validators=[validate_password]
+        write_only=True,
+        required=True,
     )
     email = serializers.EmailField()
 
@@ -73,11 +76,11 @@ class UserLoginSerializer(serializers.Serializer):
                 username=email,
             )
 
-            if not user.is_active:
-                raise ValidationError("User account is disabled")
             if not user:
                 raise ValidationError("User not found")
-            
+            if not user.is_active:
+                raise ValidationError("User account is disabled")
+
             attrs["user"] = user
             return attrs
         raise ValidationError("Must include email and password")

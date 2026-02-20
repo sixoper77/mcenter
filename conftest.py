@@ -45,7 +45,8 @@ def doctor(db, clinic):
         last_name="Иванов",
         password="simplePass126",
         email="ivanov1234@gmail.com",
-        phone="+38023475928"
+        phone="+38023475928",
+        role=User.RoleChoices.DOCTOR
     )
     doc = Doctor.objects.create(doctor=doc_user, specialization="Хирург")
     doc.clinic.add(clinic)
